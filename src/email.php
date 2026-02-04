@@ -26,6 +26,17 @@ class EmailService {
     }
     
     /**
+     * Send password reset email
+     */
+    public static function sendPasswordReset($user, $resetLink) {
+        $subject = "Password Reset Request - " . SITE_NAME;
+        
+        $emailBody = self::generatePasswordResetEmail($user, $resetLink);
+        
+        return self::sendEmail($user['email'], $user['name'], $subject, $emailBody);
+    }
+    
+    /**
      * Generate order confirmation email HTML
      */
     private static function generateOrderConfirmationEmail($order, $orderItems, $customer) {
@@ -228,6 +239,67 @@ class EmailService {
                 <!-- Footer -->
                 <div style='background-color: #374151; color: #d1d5db; padding: 20px; text-align: center; font-size: 12px;'>
                     <p style='margin: 0 0 10px 0;'>Thank you for choosing " . SITE_NAME . "!</p>
+                    <p style='margin: 0;'>Need help? Contact us at <a href='mailto:" . ADMIN_EMAIL . "' style='color: #10b981;'>" . ADMIN_EMAIL . "</a></p>
+                </div>
+                
+            </div>
+        </body>
+        </html>
+        ";
+    }
+    
+    /**
+     * Generate password reset email HTML
+     */
+    private static function generatePasswordResetEmail($user, $resetLink) {
+        return "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='UTF-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <title>Password Reset Request</title>
+        </head>
+        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9fafb;'>
+            <div style='max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);'>
+                
+                <!-- Header -->
+                <div style='background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 30px; text-align: center;'>
+                    <h1 style='margin: 0; font-size: 28px; font-weight: bold;'>" . SITE_NAME . "</h1>
+                    <p style='margin: 10px 0 0 0; opacity: 0.9;'>Password Reset Request</p>
+                </div>
+                
+                <!-- Reset Content -->
+                <div style='padding: 30px; text-align: center;'>
+                    <div style='width: 60px; height: 60px; background-color: #3b82f6; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;'>
+                        <span style='color: white; font-size: 24px;'>🔑</span>
+                    </div>
+                    <h2 style='color: #374151; margin: 0 0 10px 0; font-size: 24px;'>Password Reset Request</h2>
+                    <p style='color: #6b7280; margin: 0 0 20px 0;'>Hello " . htmlspecialchars($user['name']) . ",</p>
+                    
+                    <div style='background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;'>
+                        <p style='margin: 0 0 15px 0; color: #374151; font-size: 16px;'>We received a request to reset your password for your " . SITE_NAME . " account.</p>
+                        
+                        <p style='margin: 0 0 15px 0; color: #374151; font-size: 16px;'>If you made this request, click the button below to reset your password:</p>
+                        
+                        <div style='text-align: center; margin: 25px 0;'>
+                            <a href='{$resetLink}' style='background-color: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;'>Reset My Password</a>
+                        </div>
+                        
+                        <p style='margin: 15px 0 0 0; color: #6b7280; font-size: 14px;'>This link will expire in 1 hour for security reasons.</p>
+                        
+                        <div style='background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 20px 0;'>
+                            <p style='margin: 0; color: #92400e; font-size: 14px;'><strong>Security Note:</strong> If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
+                        </div>
+                        
+                        <p style='margin: 15px 0 0 0; color: #6b7280; font-size: 14px;'>If the button doesn't work, you can copy and paste this link into your browser:</p>
+                        <p style='margin: 5px 0 0 0; color: #3b82f6; font-size: 12px; word-break: break-all;'>{$resetLink}</p>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div style='background-color: #374151; color: #d1d5db; padding: 20px; text-align: center; font-size: 12px;'>
+                    <p style='margin: 0 0 10px 0;'>This is an automated message from " . SITE_NAME . "</p>
                     <p style='margin: 0;'>Need help? Contact us at <a href='mailto:" . ADMIN_EMAIL . "' style='color: #10b981;'>" . ADMIN_EMAIL . "</a></p>
                 </div>
                 

@@ -10,31 +10,33 @@ A modern, full-featured e-commerce platform built with PHP for local grocery sto
 ## ✨ Features
 
 ### 🛍️ Customer Features
-- **Modern Storefront** - Beautiful, responsive design
+- **Modern Storefront** - Beautiful, responsive design with hero section
 - **Product Catalog** - Browse products by categories with search and filters
 - **Shopping Cart** - Add/remove items with quantity management
-- **Wishlist** - Save favorite products for later
+- **Wishlist System** - Save favorite products for later with database persistence
 - **User Accounts** - Registration, login, and profile management
+- **Password Reset** - Secure email-based password reset functionality
 - **Multiple Payment Options** - Cash on Delivery, Bank Transfer, WhatsApp Pay
 - **Order Tracking** - Real-time order status updates
 - **Mobile Responsive** - Optimized for all devices
 
-### �️ Admin Panel
-- **Dashboard** - Overview with key business metrics
+### 🏪 Admin Panel
+- **Dashboard** - Overview with key business metrics and analytics
 - **Product Management** - Full CRUD operations with image upload
-- **Inventory Management** - Stock tracking with low stock alerts
-- **Order Management** - Process orders and update status
+- **Inventory Management** - Stock tracking with low stock alerts and bulk updates
+- **Order Management** - Process orders, update status, and view detailed order information
 - **Customer Management** - View customer data and activity
-- **Analytics & Reports** - Sales charts, revenue tracking, top products
+- **Analytics & Reports** - Interactive sales charts, revenue tracking, top products
 - **Category Management** - Organize products efficiently
 
 ### 🔧 Technical Features
 - **MVC Architecture** - Clean, maintainable code structure
 - **Secure Authentication** - Password hashing and session management
-- **Email System** - Order confirmations and notifications
+- **Email System** - Order confirmations, status updates, and password reset
 - **Image Management** - Upload, resize, and optimize product images
 - **Database Migrations** - Version-controlled database schema
 - **Responsive Design** - TailwindCSS for modern UI
+- **AJAX Integration** - Smooth user experience with real-time updates
 
 ## 🚀 Quick Start
 
@@ -59,6 +61,10 @@ A modern, full-featured e-commerce platform built with PHP for local grocery sto
    
    # Import the schema
    mysql -u root -p local_pantry < database/schema.sql
+   
+   # Run migrations for additional features
+   mysql -u root -p local_pantry < database/wishlist-migration.sql
+   mysql -u root -p local_pantry < database/password-reset-migration.sql
    ```
 
 3. **Configure the application**
@@ -75,18 +81,16 @@ A modern, full-featured e-commerce platform built with PHP for local grocery sto
    ```
 
 5. **Create admin account**
-   ```bash
-   php create-admin.php
-   ```
+   - Visit `/register.php` and create your first account
+   - Manually update the user role to 'admin' in the database
+   - Or create an admin creation script based on your needs
 
 6. **Start the application**
    - Point your web server to the `public/` directory
    - Visit your domain to see the storefront
    - Access admin panel at `/admin/`
 
-For detailed setup instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)
-
-## � Project Structure
+## 📁 Project Structure
 
 ```
 local-pantry/
@@ -99,16 +103,17 @@ local-pantry/
 │   ├── includes/          # Shared components
 │   └── *.php             # Core application files
 ├── database/              # Database schema and migrations
+├── logs/                  # Application logs
 └── docs/                  # Documentation
 ```
 
-## � Configuration
+## ⚙️ Configuration
 
 ### Database Configuration
 Edit `src/config.php`:
 ```php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'local_pantry');
+define('DB_NAME', 'your_database_name');
 define('DB_USER', 'your_username');
 define('DB_PASS', 'your_password');
 ```
@@ -116,24 +121,20 @@ define('DB_PASS', 'your_password');
 ### Email Configuration
 Configure email settings in `src/config.php`:
 ```php
-define('ADMIN_EMAIL', 'admin@yourstore.com');
-define('SMTP_USER', 'your-email@gmail.com');
+define('ADMIN_EMAIL', 'your-email@example.com');
+define('USE_SMTP', true);
 define('SMTP_PASSWORD', 'your-app-password');
 ```
 
-## � Admin Panel
+### Payment Configuration
+For Razorpay integration:
+```php
+define('RAZORPAY_KEY_ID', 'your_key_id');
+define('RAZORPAY_KEY_SECRET', 'your_key_secret');
+define('PAYMENT_ENABLED', true);
+```
 
-Access the admin panel at `/admin/` with your admin credentials.
-
-### Default Admin Features:
-- **Dashboard** - Business overview and metrics
-- **Products** - Add, edit, delete products
-- **Inventory** - Monitor stock levels and alerts
-- **Orders** - Process and track customer orders
-- **Customers** - Manage customer accounts
-- **Analytics** - Sales reports and insights
-
-## �️ Security Features
+## 🛡️ Security Features
 
 - Password hashing with PHP's `password_hash()`
 - SQL injection prevention with prepared statements
@@ -141,6 +142,7 @@ Access the admin panel at `/admin/` with your admin credentials.
 - CSRF protection for forms
 - Secure session management
 - File upload validation
+- Email-based password reset with secure tokens
 
 ## 🎨 Customization
 
@@ -155,15 +157,35 @@ Access the admin panel at `/admin/` with your admin credentials.
 - Create views in `public/`
 - Update database schema in `database/`
 
-## 📝 API Endpoints
+## � Key Pages
 
-### Wishlist API
-- `POST /wishlist-api.php` - Add/remove items from wishlist
-- Requires authentication
+### Customer Pages
+- **Homepage** - Hero section with featured products
+- **Product Catalog** - Browse and search products
+- **Product Details** - Individual product pages
+- **Shopping Cart** - Cart management
+- **Checkout** - Order placement with multiple payment options
+- **User Profile** - Account management and address book
+- **Order History** - Track past orders
+- **Wishlist** - Save favorite products
 
-### Cart Management
-- Session-based cart management
-- AJAX updates for smooth UX
+### Admin Pages
+- **Dashboard** - Business overview and metrics
+- **Products** - Product management with image upload
+- **Inventory** - Stock management with alerts
+- **Orders** - Order processing and status updates
+- **Customers** - Customer management
+- **Analytics** - Sales reports and insights
+
+## � Recent Updates
+
+- ✅ Enhanced admin panel with inventory management and analytics
+- ✅ Wishlist system with database persistence
+- ✅ Improved password reset functionality
+- ✅ Order details modal for admin
+- ✅ Bulk inventory updates
+- ✅ Interactive sales charts
+- ✅ Mobile-responsive design improvements
 
 ## 🤝 Contributing
 

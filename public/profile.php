@@ -32,37 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'update_profile') {
         $name = trim($_POST['name'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
         
         if (empty($name)) {
             $error = 'Name is required';
-        } elseif (!empty($newPassword)) {
-            // Password change requested
-            if (empty($currentPassword)) {
-                $error = 'Current password is required to change password';
-            } elseif ($newPassword !== $confirmPassword) {
-                $error = 'New passwords do not match';
-            } elseif (strlen($newPassword) < 6) {
-                $error = 'New password must be at least 6 characters long';
-            } else {
-                $result = User::changePassword($currentUser['id'], $currentPassword, $newPassword);
-                if (!$result['success']) {
-                    $error = $result['error'];
-                } else {
-                    // Update profile data
-                    User::updateProfile($currentUser['id'], [
-                        'name' => $name,
-                        'phone' => $phone,
-                        'address' => $currentUser['address'] // Keep existing address
-                    ]);
-                    $success = 'Profile and password updated successfully!';
-                    $currentUser = getCurrentUser(); // Refresh data
-                }
-            }
         } else {
-            // Just profile update
+            // Update profile data
             $result = User::updateProfile($currentUser['id'], [
                 'name' => $name,
                 'phone' => $phone,
@@ -255,27 +229,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             
                             <!-- Password Change Section -->
                             <div class="mt-8 pt-6 border-t border-gray-200">
-                                <h3 class="text-lg font-medium text-gray-800 mb-4">Change Password (Optional)</h3>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                                        <input type="password" name="current_password"
-                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                                        <input type="password" name="new_password"
-                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                                        <input type="password" name="confirm_password"
-                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                                    </div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-medium text-gray-800">Password</h3>
+                                    <a href="#" onclick="sendPasswordReset()" class="text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                        </svg>
+                                        Forgot Password
+                                    </a>
                                 </div>
+                                <p class="text-gray-600 text-sm">To change your password, click "Forgot Password" above. You'll receive an email with instructions to set a new password.</p>
+                                
+                                <!-- Password Reset Status -->
+                                <div id="passwordResetStatus" class="hidden mt-4"></div>
                             </div>
                             
                             <div class="mt-6">
@@ -495,6 +461,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         function toggleAddressForm() {
             const form = document.getElementById('addAddressForm');
             form.classList.toggle('hidden');
+        }
+        
+        function sendPasswordReset() {
+            const statusDiv = document.getElementById('passwordResetStatus');
+            const userEmail = '<?= htmlspecialchars($currentUser['email']) ?>';
+            
+            // Show loading state
+            statusDiv.className = 'mt-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm';
+            statusDiv.innerHTML = 'Sending password reset email...';
+            statusDiv.classList.remove('hidden');
+            
+            // Send AJAX request to forgot password endpoint
+            fetch('forgot-password.php?email=' + encodeURIComponent(userEmail))
+                .then(response => response.text())
+                .then(data => {
+                    // Check if the response contains success message
+                    if (data.includes('Password reset instructions have been sent')) {
+                        statusDiv.className = 'mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm';
+                        statusDiv.innerHTML = 'Password reset instructions have been sent to ' + userEmail + '. Check your email inbox.';
+                    } else {
+                        statusDiv.className = 'mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm';
+                        statusDiv.innerHTML = 'Failed to send password reset email. Please try again or contact support.';
+                    }
+                })
+                .catch(error => {
+                    statusDiv.className = 'mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm';
+                    statusDiv.innerHTML = 'An error occurred. Please try again.';
+                });
         }
     </script>
 </body>

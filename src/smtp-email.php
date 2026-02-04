@@ -28,7 +28,7 @@ class SMTPEmailService {
         // Gmail SMTP Configuration
         $smtpHost = 'smtp.gmail.com';
         $smtpPort = 587;
-        $smtpUsername = 'your-email@gmail.com'; // Your Gmail
+        $smtpUsername = 'prodigyauth.system@gmail.com'; // Your Gmail
         $smtpPassword = 'your-app-password-here';       // Gmail App Password (not regular password)
         
         // Create socket connection

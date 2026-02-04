@@ -18,11 +18,9 @@ Thumbs.db
 vendor/
 composer.lock
 
-# Configuration files with sensitive data
-src/config.php
-
 # Uploads (keep structure but ignore content)
-uploads/
+uploads/products/*
+!uploads/products/.gitkeep
 public/uploads/products/*
 !public/uploads/products/.gitkeep
 
@@ -43,12 +41,13 @@ sessions/
 .env
 .env.local
 .env.production
-.env.*
+src/config.php.local
 
 # Database backups and exports
 *.sql.backup
 *.db.backup
-*.dump
+*.sql.gz
+database_backup_*
 
 # Development and testing files
 test-*.php
@@ -57,33 +56,24 @@ fix-*.php
 setup-*.php
 check-*.php
 diagnose-*.php
-temp-*.php
+create-admin.php
+setup-database.php
 
 # Documentation drafts (keep main docs)
 *_TEMP.md
 *_DRAFT.md
 *_BACKUP.md
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# Sensitive data files
+config-local.php
+local-config.php
+private/
+sensitive/
 
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Dependency directories
+# Node modules (if using any frontend tools)
 node_modules/
+package-lock.json
 
-# Optional npm cache directory
-.npm
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
+# Build files
+dist/
+build/

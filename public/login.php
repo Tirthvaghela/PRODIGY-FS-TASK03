@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-sm font-medium text-gray-400 uppercase tracking-wide">PASSWORD</label>
-                        <a href="#" class="text-sm text-emerald-600 hover:text-emerald-500 font-medium">FORGOT?</a>
+                        <a href="#" onclick="forgotPassword()" class="text-sm text-emerald-600 hover:text-emerald-500 font-medium">FORGOT?</a>
                     </div>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -184,5 +184,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
+    <script>
+        function forgotPassword() {
+            const emailInput = document.querySelector('input[name="email"]');
+            const email = emailInput.value.trim();
+            
+            if (email) {
+                // Redirect to forgot password page with email parameter
+                window.location.href = 'forgot-password.php?email=' + encodeURIComponent(email);
+            } else {
+                // If no email entered, go to forgot password page without email
+                window.location.href = 'forgot-password.php';
+            }
+        }
+    </script>
 </body>
 </html>
