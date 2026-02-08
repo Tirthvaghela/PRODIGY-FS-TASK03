@@ -1,4 +1,7 @@
 <?php
+// Prevent any output before JSON
+ob_start();
+
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/models/Wishlist.php';
@@ -15,36 +18,61 @@ $wishlist = new Wishlist();
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    // Clear any output that might have occurred
+    ob_end_clean();
+    
+    // Set JSON header
     header('Content-Type: application/json');
     
-    switch ($_POST['action']) {
-        case 'remove':
-            $productId = $_POST['product_id'] ?? null;
-            if ($productId) {
-                $result = $wishlist->removeFromWishlist($currentUser['id'], $productId);
+    // Disable error display for API responses
+    ini_set('display_errors', 0);
+    error_reporting(0);
+    
+    try {
+        switch ($_POST['action']) {
+            case 'remove':
+                $productId = $_POST['product_id'] ?? null;
+                if ($productId) {
+                    $result = $wishlist->removeFromWishlist($currentUser['id'], $productId);
+                    echo json_encode($result);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Product ID required']);
+                }
+                exit;
+                
+            case 'move_to_cart':
+                $productId = $_POST['product_id'] ?? null;
+                $quantity = $_POST['quantity'] ?? 1;
+                if ($productId) {
+                    $result = $wishlist->moveToCart($currentUser['id'], $productId, $quantity);
+                    echo json_encode($result);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Product ID required']);
+                }
+                exit;
+                
+            case 'clear_all':
+                $result = $wishlist->clearWishlist($currentUser['id']);
                 echo json_encode($result);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Product ID required']);
-            }
-            exit;
-            
-        case 'move_to_cart':
-            $productId = $_POST['product_id'] ?? null;
-            $quantity = $_POST['quantity'] ?? 1;
-            if ($productId) {
-                $result = $wishlist->moveToCart($currentUser['id'], $productId, $quantity);
-                echo json_encode($result);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Product ID required']);
-            }
-            exit;
-            
-        case 'clear_all':
-            $result = $wishlist->clearWishlist($currentUser['id']);
-            echo json_encode($result);
-            exit;
+                exit;
+                
+            default:
+                echo json_encode(['success' => false, 'message' => 'Invalid action']);
+                exit;
+        }
+    } catch (Exception $e) {
+        // Log error but return clean JSON
+        error_log('Wishlist Error: ' . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'An error occurred. Please try again.'
+        ]);
+        exit;
     }
 }
+
+// Clear output buffer for normal page rendering
+ob_end_clean();
 
 // Get user's wishlist
 $wishlistItems = $wishlist->getUserWishlist($currentUser['id']);

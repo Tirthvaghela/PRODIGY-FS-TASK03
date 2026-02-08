@@ -138,20 +138,35 @@ class Wishlist {
             // Start transaction
             $this->db->beginTransaction();
             
+            // Verify product exists and is active
+            $stmt = $this->db->prepare("
+                SELECT id, name, stock 
+                FROM products 
+                WHERE id = ? AND status = 'active'
+            ");
+            $stmt->execute([$productId]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$product) {
+                $this->db->rollback();
+                return ['success' => false, 'message' => 'Product not found or unavailable'];
+            }
+            
+            // Check stock
+            if ($product['stock'] < $quantity) {
+                $this->db->rollback();
+                return ['success' => false, 'message' => 'Insufficient stock available'];
+            }
+            
             // Add to cart
             require_once __DIR__ . '/../cart.php';
-            $cartResult = addToCart($productId, $quantity);
+            addToCart($productId, $quantity);
             
-            if ($cartResult['success']) {
-                // Remove from wishlist
-                $this->removeFromWishlist($userId, $productId);
-                
-                $this->db->commit();
-                return ['success' => true, 'message' => 'Product moved to cart'];
-            } else {
-                $this->db->rollback();
-                return ['success' => false, 'message' => $cartResult['message']];
-            }
+            // Remove from wishlist
+            $this->removeFromWishlist($userId, $productId);
+            
+            $this->db->commit();
+            return ['success' => true, 'message' => 'Product moved to cart'];
         } catch (Exception $e) {
             $this->db->rollback();
             error_log("Error moving to cart: " . $e->getMessage());
